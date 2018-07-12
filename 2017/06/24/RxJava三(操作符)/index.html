@@ -15,7 +15,7 @@
     <meta name="description" content="">
     <meta name="Cache-Control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <title>计算机网络基础（二） · XD&#39;s blog</title>
+    <title>RxJava三(操作符) · XD&#39;s blog</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -207,7 +207,7 @@
                 <a href="/zhongxuedong/" >XD&#39;s blog</a>
             </div>
             <div class="post-title">
-                <a href="#" class="post-name">计算机网络基础（二）</a>
+                <a href="#" class="post-name">RxJava三(操作符)</a>
             </div>
     </div>
     
@@ -239,7 +239,7 @@ height:50vh;
         <h1 class="intro-title">
             <!-- 主页  -->
             
-            计算机网络基础（二）
+            RxJava三(操作符)
             <!-- 404 -->
             
         </h1>
@@ -257,13 +257,13 @@ height:50vh;
             
                 <div class= post-intro-tags >
     
-        <a class="post-tag" href="javascript:void(0);" data-tags = "计算机网络">计算机网络</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags = "Android">Android</a>
     
 </div>
             
             <div class="post-intro-meta">
                 <span class="post-intro-calander iconfont-archer">&#xe676;</span>
-                <span class="post-intro-time">2017/05/14</span>
+                <span class="post-intro-time">2017/06/24</span>
                 
                 <span id="busuanzi_container_page_pv" class="busuanzi-pv">
                     <span class="iconfont-archer">&#xe602;</span>
@@ -389,46 +389,38 @@ height:50vh;
         <div class="container container-unloaded">
             <main class="main post-page">
     <article class="article-entry">
-        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>前篇文章学习了计算机网络体系结构，这篇文章将详细学习TCP/UDP协议，含其特点，三次握手，四次挥手，无差错传输等知识。</p>
-<hr>
-<h1 id="TCP协议"><a href="#TCP协议" class="headerlink" title="TCP协议"></a>TCP协议</h1><p>TCP（传输控制协议）是一种面向连接的，可靠的，基于字节流的传输层通讯协议</p>
-<p>TCP协议是HTTP/HTTPS，WebSocket等协议的基础，我们首先来看看它的报文格式。</p>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>前面两篇文章中我们介绍了RxJava的一些基本概念和RxJava最简单的用法。从这一章开始，我们开始聊聊RxJava中的操作符(Operators)，RxJava中的操作符主要分成了三类：</p>
 <ul>
-<li>TCP虽然面向字节流，但传送的数据单元 = 报文段</li>
-<li>报文段 = 首部 + 数据 2部分</li>
-<li>TCP的全部功能体现在它首部中各字段的作用，故下面主要讲解TCP报文段的首部</li>
+<li>转换类操作符(map flatMap concatMap flatMapIterable switchMap scan groupBy…)；</li>
+<li>过滤类操作符(fileter take takeLast takeUntil distinct distinctUntilChanged skip skipLast …)；</li>
+<li>组合类操作符(merge zip join combineLatest and/when/then switch startSwitch…)。</li>
 </ul>
-<p><img src="http://p8i50lrny.bkt.clouddn.com/image/internet/tixijiegou_003.png944365-123333642e8eb31a.png" alt=""></p>
-<p>1.首部前20个字符固定，后面有4n个字节是根据需求而增加的选项<br>2.故TCP首部最小长度 = 20字节</p>
-<p><img src="http://p8i50lrny.bkt.clouddn.com/image/internet/tixijiegou_004.png944365-4740db911582939f.png" alt=""></p>
-<hr>
-<h1 id="三次握手"><a href="#三次握手" class="headerlink" title="三次握手"></a>三次握手</h1><p><img src="http://p8i50lrny.bkt.clouddn.com/image/internet/tixijiegou_005.png944365-895493e20637d2b0.png" alt=""></p>
-<ul>
-<li>第一次握手：建立连接。客户端发送连接请求报文段，将SYN位置为1，Sequence Number为X，然后客户端进入SYN_SEND状态，等待服务器确认</li>
-<li>第二次握手：服务器收到SYN报文段。服务器收到客户端的SYN报文段，需要对这个SYN报文段进行确认，设置Acknowledgment Number为x+1(Sequence Number+1)；同时，自己自己还要发送SYN请求信息，将SYN位置为1，Sequence Number为y；服务器端将上述所有信息放到一个报文段（即SYN+ACK报文段）中，一并发送给客户端，此时服务器进入SYN_RECV状态；</li>
-<li>第三次握手：客户端收到服务器的SYN+ACK报文段。然后将Acknowledgment Number设置为y+1，向服务器发送ACK报文段，这个报文段发送完毕以后，客户端和服务器端都进入ESTABLISHED状态，完成TCP三次握手。<br>完成了三次握手，客户端和服务器端就可以开始传送数据。以上就是TCP三次握手的总体介绍。</li>
-</ul>
-<h3 id="为什么TCP建立连接需要三次握手"><a href="#为什么TCP建立连接需要三次握手" class="headerlink" title="为什么TCP建立连接需要三次握手"></a>为什么TCP建立连接需要三次握手</h3><p>防止服务器端因接收到了早已失效的连接请求报文，从而一直等待客户端请求，最终导致形成死锁，浪费资源</p>
-<p><img src="http://p8i50lrny.bkt.clouddn.com/image/internet/tixijiegou_006.png944365-1551b53e24060636.jpg" alt=""></p>
-<h1 id="四次挥手"><a href="#四次挥手" class="headerlink" title="四次挥手"></a>四次挥手</h1><p><img src="http://p8i50lrny.bkt.clouddn.com/image/internet/tixijiegou_007.png944365-6162a7db50ebb9d3.png" alt=""></p>
-<ul>
-<li>第一次挥手：主机1（可以是客户端也可以是服务端），设置sequence number和acknowledgement number向主机2发送一个FIN报文段；此时，主机1进入FIN_WAIT_1状态，这表示主机1没有数据发送给主机2了。</li>
-<li>第二次挥手：主机2收到了主机1发送的FIN报文段，向主机1回一个ACK报文段，Acknowledgment Number为Sequence Number加1；主机1进入FIN_WAIT_2状态；主机2告诉主机1，我“同意”你的关闭请求；</li>
-<li>第三次挥手：主机2向主机1发送FIN报文段，请求关闭连接，同时主机2进入LAST_ACK状态；</li>
-<li>第四次挥手：主机1收到主机2发送的FIN报文段，向主机2发送ACK报文段，然后主机1进入TIME_WAIT状态；主机2收到主机1的ACK报文段以后，就关闭连接；此时，主机1等待2MSL后依然没有收到回复，则证明Server端已正常关闭，那好，主机1也可以关闭连接了。</li>
-</ul>
-<h3 id="为什么TCP释放连接需要四次挥手"><a href="#为什么TCP释放连接需要四次挥手" class="headerlink" title="为什么TCP释放连接需要四次挥手"></a>为什么TCP释放连接需要四次挥手</h3><p>为了保证通讯双方都能通知对方需释放&amp;断开连接<br><img src="http://p8i50lrny.bkt.clouddn.com/image/internet/tixijiegou_008.png944365-345dbc590bbcb19d.jpg" alt=""></p>
-<h1 id="UDP协议"><a href="#UDP协议" class="headerlink" title="UDP协议"></a>UDP协议</h1><p>UDP User Datagram Protocol,即用户数据报协议 属于传输层通讯协议 基于UDP的应用层协议有TFTP，SNMP与DNS<br>UDP是一种无连接的，不可靠的，面向报文，无拥塞控制的协议</p>
-<p>UDP的报文段主要有两个字段：数据字段&amp;首部字段<br><img src="http://p8i50lrny.bkt.clouddn.com/image/internet/tixijiegou_009.png162db5e96bce4e36.png" alt=""></p>
-<h1 id="TCP协议与UDP协议的区别"><a href="#TCP协议与UDP协议的区别" class="headerlink" title="TCP协议与UDP协议的区别"></a>TCP协议与UDP协议的区别</h1><p><img src="http://p8i50lrny.bkt.clouddn.com/image/internet/tixijiegou_010.png944365-53f4b3bc1ed4d17e.png" alt=""></p>
+<p>这一章我们主要讲讲转换类操作符。所有这些Operators都作用于一个可观测序列，然后变换它发射的值，最后用一种新的形式返回它们。概念实在是不好理解，下面我们结合实际的例子一一介绍。</p>
+<p><br></p>
+<h3 id="map"><a href="#map" class="headerlink" title="map"></a>map</h3><p>map()函数接受一个Func1类型的参数(就像这样map(Func1&lt;? super T, ? extends R&gt; func)),然后把这个Func1应用到每一个由Observable发射的值上，将发射的值转换为我们期望的值。我们来看一下官方给出的原理图：</p>
+<p><img src="http://p8i50lrny.bkt.clouddn.com/image/android/android_003.png8f252f8b8c7a439470b7134ec0b860dd_hd.jpg" alt=""></p>
+<p>假设我们需要将一组数字转换成字符串，我们可以通过map这样实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">Observable.just(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line">        .map(<span class="keyword">new</span> Func1&lt;Integer, String&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> String <span class="title">call</span><span class="params">(Integer i)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="string">"This is "</span> + i;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;).subscribe(<span class="keyword">new</span> Action1&lt;String&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">                System.out.println(s);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br></pre></td></tr></table></figure>
+<p>这里出现了一个叫做Func1的类。它和Action1非常相似，也是RxJava的一个接口，用于包装含有一个参数的方法。Func1和Action的区别在于，Func1包装的是有返回值的方法。另外和ActionX一样，FuncX也有多个，用于不同参数个数的方法。FuncX和ActionX的区别在Funck包装的是有返回值得方法。</p>
+<p>Func1构造函数中的两个参数分别是Observable发射值当前的类型和map转换后的类型，上面这个例子中发射值当前的类型是Integer,转换后的类型是String。</p>
+<p><br></p>
+<h3 id="flatMap"><a href="#flatMap" class="headerlink" title="flatMap"></a>flatMap</h3><p>flatMap()函数同样也是做转换的，但是作用却不一样。flatMap不太好理解，我们直接看例子：假设我们有一组小区Community[] communites,现在我们要输出每个小区的名字；我们可以这样实现:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Observable.from(communities)</span><br><span class="line">        .map(<span class="keyword">new</span> Func1&lt;Community, String&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> String <span class="title">call</span><span class="params">(Community community)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> community.name;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">        .subscribe(<span class="keyword">new</span> Action1&lt;String&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">                System.out.println(<span class="string">"Community name : "</span> + name);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br></pre></td></tr></table></figure>
+<p>现在我们需求有变化，需要打印出每个小区下面所有房子的价格。于是我可以这样实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">Community[] communities = &#123;&#125;;</span><br><span class="line">Observable.from(communities)</span><br><span class="line">        .subscribe(<span class="keyword">new</span> Action1&lt;Community&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(Community community)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">for</span> (House house : community.houses) &#123;</span><br><span class="line">                    System.out.println(<span class="string">"House price : "</span> + house.price);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br></pre></td></tr></table></figure>
+<p>如果我不想在Subscriber中使用for循环，而是希望Subscriber中直接传入单个的House对象呢（这对于代码复用很重要）？用map()显然是不行的，因为map()是一对一的转化，而我现在的要求是一对多的转化。那么我们可以使用flatMap()把一个Community转化成多个House。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">Observable.from(communities)</span><br><span class="line">        .flatMap(<span class="keyword">new</span> Func1&lt;Community, Observable&lt;House&gt;&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> Observable&lt;House&gt; <span class="title">call</span><span class="params">(Community community)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> Observable.from(community.houses);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">        .subscribe(<span class="keyword">new</span> Action1&lt;House&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(House house)</span> </span>&#123;</span><br><span class="line">                System.out.println(<span class="string">"House price : "</span> + house.price);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br></pre></td></tr></table></figure>
+<p>从前面的例子中你肯定发现了，flatMap()和map()都是把传入的参数转化之后返回另一个对象。但和map()不同的是，flatMap()中返回的是Observable对象，并且这个Observable对象并不是被直接发送到 Subscriber的回调方法中。</p>
+<p>flatMap()的原理是这样的：</p>
+<p>将传入的事件对象装换成一个Observable对象；<br>这是不会直接发送这个Observable, 而是将这个Observable激活让它自己开始发送事件；<br>每一个创建出来的Observable发送的事件，都被汇入同一个Observable，这个Observable负责将这些事件统一交给Subscriber的回调方法。<br>这三个步骤，把事件拆成了两级，通过一组新创建的Observable将初始的对象『铺平』之后通过统一路径分发了下去。而这个『铺平』就是flatMap()所谓的flat。</p>
 
     </article>
     <!-- license  -->
     
         <div class="license-wrapper">
             <p>原文作者: <a href="https://theeastgod.github.io/zhongxuedong">zhongxuedong</a>
-            <p>原文链接: <a href="https://theeastgod.github.io/zhongxuedong/2017/05/14/计算机网络基础（二）/">https://theeastgod.github.io/zhongxuedong/2017/05/14/计算机网络基础（二）/</a>
-            <p>发表日期: <a href="https://theeastgod.github.io/zhongxuedong/2017/05/14/计算机网络基础（二）/">May 14th 2017, 4:32:38</a>
+            <p>原文链接: <a href="https://theeastgod.github.io/zhongxuedong/2017/06/24/RxJava三(操作符)/">https://theeastgod.github.io/zhongxuedong/2017/06/24/RxJava三(操作符)/</a>
+            <p>发表日期: <a href="https://theeastgod.github.io/zhongxuedong/2017/06/24/RxJava三(操作符)/">June 24th 2017, 10:14:20</a>
             <p>版权声明: 本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
         </div>
     
@@ -436,17 +428,12 @@ height:50vh;
     <ul class="post-paginator">
         <li class="next">
             
-                <div class="nextSlogan">Next Post</div>
-                <a href= "/zhongxuedong/2017/05/18/计算机网络基础（三）/" title= 计算机网络基础（三） >
-                    <div class="nextTitle">计算机网络基础（三）</div>
-                </a>
-            
         </li>
         <li class="previous">
             
                 <div class="prevSlogan">Previous Post</div>
-                <a href= "/zhongxuedong/2017/05/10/计算机网络基础（一）/" title= 计算机网络基础（一） >
-                    <div class="prevTitle">计算机网络基础（一）</div>
+                <a href= "/zhongxuedong/2017/06/22/RxJava二(基本概念及使用)/" title= RxJava二(基本概念及使用) >
+                    <div class="prevTitle">RxJava二(基本概念及使用)</div>
                 </a>
             
         </li>
@@ -543,7 +530,7 @@ top:50vh;
         <div class="toc-catalog">
             <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
         </div>
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TCP协议"><span class="toc-number">2.</span> <span class="toc-text">TCP协议</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#三次握手"><span class="toc-number">3.</span> <span class="toc-text">三次握手</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#为什么TCP建立连接需要三次握手"><span class="toc-number">3.0.1.</span> <span class="toc-text">为什么TCP建立连接需要三次握手</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#四次挥手"><span class="toc-number">4.</span> <span class="toc-text">四次挥手</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#为什么TCP释放连接需要四次挥手"><span class="toc-number">4.0.1.</span> <span class="toc-text">为什么TCP释放连接需要四次挥手</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#UDP协议"><span class="toc-number">5.</span> <span class="toc-text">UDP协议</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TCP协议与UDP协议的区别"><span class="toc-number">6.</span> <span class="toc-text">TCP协议与UDP协议的区别</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#map"><span class="toc-number">1.0.1.</span> <span class="toc-text">map</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#flatMap"><span class="toc-number">1.0.2.</span> <span class="toc-text">flatMap</span></a></li></ol></li></ol></li></ol>
     </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
